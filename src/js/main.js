@@ -2,25 +2,24 @@ import { invoke } from '@tauri-apps/api/core';
 
 const searchInput = document.getElementById("search-input");
 const statusTxt = document.getElementById("track-status");
+const trackTitle = document.getElementById("track-title"); // Pegamos o título
 const playIcon = document.getElementById("play-icon");
 const volSlider = document.getElementById("vol-slider");
 const playBtn = document.getElementById("play-btn");
+const albumArtStack = document.querySelector(".album-art-stack"); // Pegamos a área da capa
 
 // Variável Global do Player
 let audioPlayer = new Audio();
-
-// Configuração inicial
 audioPlayer.volume = 0.5;
 
-// Eventos do Player (Para atualizar a UI quando a música acabar ou der erro)
+// --- Eventos do Player ---
 audioPlayer.onplaying = () => {
-    statusTxt.textContent = "Reproduzindo Streaming (Web Audio)";
-    statusTxt.style.color = "#00ff88";
+    // Quando começa a tocar, atualiza ícone
     playIcon.textContent = "pause";
 };
 
 audioPlayer.onerror = () => {
-    statusTxt.textContent = "Erro ao carregar stream.";
+    statusTxt.textContent = "Erro ao carregar áudio.";
     statusTxt.style.color = "red";
     playIcon.textContent = "play_arrow";
 };
@@ -30,7 +29,7 @@ audioPlayer.onended = () => {
     statusTxt.textContent = "Fim da reprodução.";
 };
 
-// Função Play/Pause
+// --- Função Play/Pause ---
 function togglePause() {
     if (audioPlayer.paused && audioPlayer.src) {
         audioPlayer.play();
@@ -41,33 +40,48 @@ function togglePause() {
     }
 }
 
-// Botão de Play na UI
 if (playBtn) {
     playBtn.addEventListener("click", togglePause);
 }
 
-// Busca ao dar Enter
+// --- Busca e Metadados ---
 searchInput.addEventListener("keypress", async (e) => {
     if (e.key === "Enter") {
         const query = searchInput.value;
         if (!query) return;
 
-        // Reset visual
+        // 1. Reset visual antes de buscar
         audioPlayer.pause();
         searchInput.disabled = true;
-        statusTxt.textContent = "Buscando link...";
+        
+        statusTxt.textContent = "Carregando metadados...";
         statusTxt.style.color = "#00e5ff";
+        
+        // Reset da capa (volta pro ícone padrão enquanto carrega)
+        albumArtStack.innerHTML = `
+            <div class="icon-bg">
+                <span class="material-icons-round">album</span>
+            </div>`;
 
         try {
-            // Pede o link ao Rust
-            const url = await invoke("play_track", { query: query });
+            // 2. Chama o Rust e espera o OBJETO metadata
+            const metadata = await invoke("play_track", { query: query });
             
-            console.log("Link recebido:", url);
-            statusTxt.textContent = "Carregando stream...";
+            console.log("Metadados recebidos:", metadata);
             
-            // TOCA NO JAVASCRIPT (Instantâneo)
-            audioPlayer.src = url;
-            audioPlayer.play(); // O navegador lida com o buffer magicamente
+            // 3. Atualiza a Interface
+            statusTxt.textContent = metadata.author; // Nome do Artista
+            statusTxt.style.color = "#ccc"; // Cor normal
+            trackTitle.textContent = metadata.title; // Nome da Música
+
+            // Atualiza a Capa do Álbum
+            if (metadata.thumbnail) {
+                albumArtStack.innerHTML = `<img src="${metadata.thumbnail}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">`;
+            }
+
+            // 4. Toca a música
+            audioPlayer.src = metadata.url;
+            audioPlayer.play();
 
             searchInput.value = "";
             searchInput.disabled = false;
@@ -82,6 +96,5 @@ searchInput.addEventListener("keypress", async (e) => {
 
 // Controle de Volume
 volSlider.addEventListener("input", (e) => {
-    const val = parseFloat(e.target.value);
-    audioPlayer.volume = val;
+    audioPlayer.volume = parseFloat(e.target.value);
 });

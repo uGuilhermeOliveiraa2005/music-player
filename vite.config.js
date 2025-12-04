@@ -1,15 +1,24 @@
 import { defineConfig } from "vite";
+import { resolve } from "path"; // Importante para resolver caminhos
 
 export default defineConfig({
-  // Impede que o Vite limpe o terminal (bom para ver erros)
   clearScreen: false,
+  
+  // AQUI ESTÁ O SEGREDO: Mudamos a raiz para "src"
+  root: "src", 
+
   server: {
-    port: 5173,       // Garante a porta 5173
-    strictPort: true, // Se a porta estiver ocupada, avisa
-    host: true,       // Permite que o Tauri acesse o servidor no Windows
+    port: 5173,
+    strictPort: true,
+    host: true,
     watch: {
-      // Ignora a pasta do Rust para não ficar recarregando à toa
       ignored: ["**/src-tauri/**"],
     },
+  },
+
+  // Como mudamos a raiz, precisamos dizer onde jogar os arquivos finais (build)
+  build: {
+    outDir: "../dist", // Volta uma pasta e cria a dist na raiz do projeto
+    emptyOutDir: true,
   },
 });

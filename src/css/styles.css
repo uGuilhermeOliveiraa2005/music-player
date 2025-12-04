@@ -1,0 +1,124 @@
+:root {
+    --bg-dark: #0f0c29;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #00e5ff;
+    --text-main: #ffffff;
+    --text-sec: #aaaaaa;
+    --sidebar-width: 240px;
+    --player-height: 90px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    overflow: hidden; /* Remove barra de rolagem do windows */
+    height: 100vh;
+}
+
+/* --- Background Blobs (Mantidos mas suavizados) --- */
+.background-blobs {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    background: radial-gradient(circle at top left, #302b63, #0f0c29);
+}
+.blob {
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
+}
+.blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #24243e; }
+.blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #0f0c29; }
+.blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: #5c258d; opacity: 0.2; }
+
+/* --- App Layout (Grid System) --- */
+.app-layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-rows: 1fr var(--player-height);
+    grid-template-areas: 
+        "sidebar content"
+        "player player";
+    height: 100vh;
+    padding: 10px;
+    gap: 10px;
+}
+
+/* --- Glassmorphism Base --- */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+}
+
+/* --- 1. Sidebar --- */
+.sidebar {
+    grid-area: sidebar;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 40px; color: var(--accent);
+}
+
+.nav-menu { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+.nav-btn {
+    display: flex; align-items: center; gap: 15px;
+    background: transparent; border: none;
+    color: var(--text-sec); font-size: 0.95rem; font-weight: 500;
+    padding: 12px 15px; border-radius: 10px; cursor: pointer;
+    transition: 0.3s; text-align: left;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+.nav-btn.active { background: rgba(0, 229, 255, 0.1); color: var(--accent); }
+
+/* --- 2. Content Area --- */
+.content-area {
+    grid-area: content;
+    padding: 30px;
+    overflow-y: auto; /* Scroll apenas no conteúdo */
+    position: relative;
+}
+
+.view-section { display: none; animation: fadeIn 0.4s ease; }
+.view-section.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Cards & Search */
+.search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(0,0,0,0.3); padding: 15px 20px;
+    border-radius: 50px; margin-top: 20px; border: 1px solid var(--glass-border);
+}
+.search-bar input {
+    background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 1rem;
+}
+
+/* --- 3. Player Bar --- */
+.player-bar {
+    grid-area: player;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 30px;
+    border-radius: 16px 16px 0 0; /* Arredondado só em cima se quiser colar no fundo, mas aqui deixei flutuante */
+}
+
+.player-info { display: flex; align-items: center; gap: 15px; width: 250px; }
+.album-art { width: 50px; height: 50px; background: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.album-art img { width: 100%; height: 100%; object-fit: cover; }
+.track-details h4 { font-size: 0.9rem; margin-bottom: 2px; }
+.track-details p { font-size: 0.75rem; color: var(--text-sec); }
+
+.player-controls { display: flex; align-items: center; gap: 20px; }
+.ctrl-btn { background: transparent; border: none; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+.ctrl-btn:hover { color: var(--accent); }
+.play-btn { width: 45px; height: 45px; background: white; color: black; border-radius: 50%; }
+.play-btn:hover { background: var(--accent); color: black; transform: scale(1.1); }
+
+.player-volume { display: flex; align-items: center; gap: 10px; width: 150px; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
