@@ -3,7 +3,7 @@
   "productName": "nebula-player",
   "version": "0.1.0",
   "identifier": "com.nebula.player",
-  "build": {
+ "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
     "devUrl": "http://localhost:5173",
@@ -35,7 +35,7 @@
       "icons/icon.ico"
     ],
     "externalBin": [
-      "binaries/ytdlp"
+      "ytdlp"
     ]
   }
 }

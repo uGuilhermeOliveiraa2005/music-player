@@ -1,19 +1,18 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Permissões padrão do Nebula Player",
+  "description": "Capability for the main window",
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "shell:allow-execute",
     "shell:allow-open",
     {
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "binaries/ytdlp",
-          "args": true,
-          "sidecar": true
+          "name": "ytdlp",
+          "cmd": "ytdlp",
+          "args": true
         }
       ]
     }
